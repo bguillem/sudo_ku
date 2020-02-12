@@ -118,14 +118,20 @@ def solve_sudoku(board):
     return False
 
 
+def display_board(map):
+
+    for i in range(len(map)):
+        print("-------------------------------------")
+        print("| %i | %i | %i | %i | %i | %i | %i | %i | %i |" %(map[i][0], map[i][1],
+        map[i][2], map[i][3], map[i][4], map[i][5], map[i][6], map[i][7], map[i][8]))
+    print("-------------------------------------")
+
 
 board = error_handling(len(sys.argv), sys.argv)
 print("Successfully loaded map :")
-for i in range(0, len(board)):
-    print(board[i])
+display_board(board)
 
-print("\nstarting solver\n. . .")
+print("\nstarting solver\n. . .\n")
 solve_sudoku(board)
-print("done.")
-for i in range(0, len(board)):
-    print(str(board[i]))
+print("done:")
+display_board(board)
