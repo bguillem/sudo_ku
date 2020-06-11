@@ -1,45 +1,28 @@
 #!/usr/bin/python
-#~ bguillem // simple backtracking sudoku solver
+#~ bogdzn
 
 import sys
 
+def read_map(filepath):
+    lines = 0
+    cols = 0
+    matrix = [[0 for x in range(9)] for y in range(9)]
 
-def check_if_no_duplicates(line):
-    dup = "0123456789"
-    duplicates = list(dup)
-    ind_in_duplicate = 0
-    index = 0
-
-    while (index < len(line)):
-        if (line[index] >= '0' and line[index] <= '9'):
-            ind_in_duplicate = int(line[index])
-            if (duplicates[ind_in_duplicate] == "x" and ind_in_duplicate != 0):
-                return False
-            else:
-                duplicates[ind_in_duplicate] = "x"
-        index += 1
-    return True
-
-
-
-def check_if_line_is_valid(line):
-    result = []
-
-    if (len(line) != 10):
-        print("Error: line should be 10 characters long, including the newline character.", file=sys.stderr)
-        sys.exit(-1)
-    for index in range (len(line)):
-        if (line[index] < '0' or line[index] > '9') and line[index] != '\n':
-            print("Error: character %c is not valid !", line[index])
-            sys.exit(-1)
-    if (check_if_no_duplicates(line) == False):
-        print("Duplicates numbers spotted on this line :", file=sys.stderr)
-        print(line, file=sys.stderr)
-        sys.exit(-1)
-
-    for i in range(9):
-        result.append(int(line[i]))
-    return result
+    try:
+        file = open(filepath, 'r')
+    except IOError:
+        print("Error: file could not be openend.", file = sys.stderr)
+        exit(-1)
+    while lines != 9:
+        cols = 0
+        character = file.readline()
+        for c in character:
+            matrix[lines][cols] = int(c)
+            cols += 1
+            if cols == 9 :
+                lines += 1
+                break
+    return matrix
 
 
 
@@ -53,23 +36,24 @@ def display_usage(return_value):
 
 
 
-def error_handling(nb_args, args):
-    file_d = 0
-    result = []
+def print_board(board):
 
-    if (nb_args != 2):
-        display_usage(-1)
-    elif (args[1] == "help"):
-        display_usage(0)
+    if not board:
+        print("No solution found.")
+        exit(1)
 
-    try:
-        file_d = open(args[1], "r")
-    except IOError:
-        print("Error: file could not be opened.\nPlease check \"help\" flag for more info.", file=sys.stderr)
-        sys.exit(-1)
-    for line in file_d:
-        result.append(check_if_line_is_valid(line))
-    return result
+    for i in range(len(board)):
+        if i % 3 == 0 and i != 0 :
+            print("- - - - - - - - - - - - - ")
+
+        for j in range(len(board[0])) :
+            if j % 3 == 0 and j != 0 :
+                print(" | ", end="")
+
+            if j == 8 :
+                print(board[i][j])
+            else :
+                print(str(board[i][j]) + " ", end="")
 
 
 
@@ -97,7 +81,6 @@ def is_valid_play(board, number, position):
         for j in range (box_x * 3, box_x * 3 + 3):
             if board[i][j] == number and (i, j) != position:
                 return False
-
     return True
 
 
@@ -118,20 +101,17 @@ def solve_sudoku(board):
     return False
 
 
-def display_board(map):
 
-    for i in range(len(map)):
-        print("-------------------------------------")
-        print("| %i | %i | %i | %i | %i | %i | %i | %i | %i |" %(map[i][0], map[i][1],
-        map[i][2], map[i][3], map[i][4], map[i][5], map[i][6], map[i][7], map[i][8]))
-    print("-------------------------------------")
+#################################################
+################# MAIN SCRIPT ###################
+#################################################
 
+if len(sys.argv) == 2 :
+    if sys.argv[1] == "-help" :
+        display_usage(0)
 
-board = error_handling(len(sys.argv), sys.argv)
-print("Successfully loaded map :")
-display_board(board)
+    sudoku = read_map(sys.argv[1])
+    print_board(solve_sudoku(sudoku))
+    exit(0)
+display_usage(-1)
 
-print("\nstarting solver\n. . .\n")
-solve_sudoku(board)
-print("done:")
-display_board(board)
